@@ -1,16 +1,28 @@
 const url = `https://randomuser.me/api/?nat=us&exc=nat,gender,id,registered,login&results=12&noinfo`;
+const gallery = document.getElementById("gallery");
 
 class Person {
-  constructor(obj, i) {
-    const { street, city, state, postcode } = obj.location;
-    this.id = i;
-    this.name = `${obj.name.first} ${obj.name.last}`;
-    this.image = obj.picture.medium;
-    this.email = obj.email;
+  constructor(obj) {
+    const {
+      name: { first, last },
+      location: {
+        street: { number, name },
+        city,
+        state,
+        postcode,
+      },
+      dob: { date },
+      phone,
+      email,
+      picture: { medium: pic },
+    } = obj;
+    this.name = `${first} ${last}`;
+    this.image = pic;
+    this.email = email;
     this.city = `${city}, ${state}`;
-    this.location = `${street.number} ${street.name}<br>${city}, ${state} ${postcode}`;
-    this.dob = obj.dob.date.replace(/^(\d{4})-(\d{2})-(\d{2}).+$/, "$2/$3/$1");
-    this.phone = obj.phone.replace(/^(\d{3})-(\d{3}-\d{4})$/, "($1) $2");
+    this.location = `${number} ${name}<br>${city}, ${state} ${postcode}`;
+    this.dob = date.replace(/^(\d{4})-(\d{2})-(\d{2}).+$/, "$2/$3/$1");
+    this.phone = phone.replace(/^\D*(\d{3})\D*(\d{3}\D\d{4})$/, "($1) $2");
   }
   makeCard() {
     return `<div class="card">
@@ -32,7 +44,7 @@ class Person {
         <div class="modal-info-container">
           <img class="modal-img" src="${this.image}" alt="profile picture">
           <h3 class="modal-name cap">${this.name}</h3>
-          <p class="modal-text">${this.city}</p>
+          <p class="modal-text">${this.email}</p>
           <p class="modal-text cap">${this.city}</p>
           <hr>
           <p class="modal-text">${this.phone}</p>
@@ -51,11 +63,14 @@ let usersArray = [];
 async function getUsers(url) {
   const res = await fetch(url);
   const { results } = await res.json();
-  usersArray = await results.map((user, i) => new Person(user, i));
-  return usersArray.forEach((user) => {
-    document
-      .getElementById("gallery")
-      .insertAdjacentHTML("beforeend", user.makeCard());
+  usersArray = await results.map((user) => new Person(user));
+  usersArray.forEach((user) => {
+    gallery.insertAdjacentHTML("beforeend", user.makeCard());
+  });
+  [...document.getElementsByClassName("card")].forEach((card) => {
+    card.addEventListener("click", (e) => {
+      console.log(usersArray[[...gallery.children].indexOf(card)].makeModal());
+    });
   });
 
   // .catch((err) => console.log("Error: " + err.message));
