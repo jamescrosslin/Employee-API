@@ -69,10 +69,9 @@ async function getUsers(url) {
   });
   [...document.getElementsByClassName("card")].forEach((card) => {
     card.addEventListener("click", (e) => {
-      console.log(usersArray[[...gallery.children].indexOf(card)].makeModal());
+      const html = usersArray[[...gallery.children].indexOf(card)].makeModal();
+      gallery.insertAdjacentHTML("beforeend", html);
     });
   });
-
-  // .catch((err) => console.log("Error: " + err.message));
 }
 getUsers(url);
