@@ -6,7 +6,7 @@ class Person {
     const {
       name: { first, last },
       location: {
-        street: { number, name },
+        street: { number: streetNum, name: streetName },
         city,
         state,
         postcode,
@@ -14,13 +14,14 @@ class Person {
       dob: { date },
       phone,
       email,
-      picture: { medium: pic },
+      picture: { large: pic },
     } = obj;
+
     this.name = `${first} ${last}`;
     this.image = pic;
     this.email = email;
     this.city = `${city}, ${state}`;
-    this.location = `${number} ${name}<br>${city}, ${state} ${postcode}`;
+    this.location = `${streetNum} ${streetName}<br>${city}, ${state} ${postcode}`;
     this.dob = date.replace(/^(\d{4})-(\d{2})-(\d{2}).+$/, "$2/$3/$1");
     this.phone = phone.replace(/^\D*(\d{3})\D*(\d{3}\D\d{4})$/, "($1) $2");
   }
@@ -59,21 +60,41 @@ class Person {
     </div>`;
   }
 }
+class Gallery {
+  constructor() {
+    this.users;
+    this.activeUser;
+  }
+  createUsers() {}
+  postModal() {}
+}
 let usersArray = [];
 async function getUsers(url) {
   const res = await fetch(url);
   const { results } = await res.json();
-  usersArray = await results.map((user) => new Person(user));
+  usersArray = results.map((user) => new Person(user));
+
   usersArray.forEach((user, i) => {
     gallery.insertAdjacentHTML("beforeend", user.makeCard());
     gallery.lastElementChild.addEventListener("click", () => {
       const html = usersArray[i].makeModal();
       gallery.insertAdjacentHTML("beforeend", html);
       const modal = gallery.lastElementChild;
+      //add postModal(modal) and include the following
       modal.addEventListener("click", (e) => {
-        if (e.target.id === "modal-close-btn")
-          return gallery.removeChild(modal);
-        if (e.target.id === "modal-prev") return arr[i];
+        if (e.target.tagName === "BUTTON") gallery.removeChild(modal);
+        if (e.target.id === "modal-prev") {
+          gallery.insertAdjacentHTML(
+            "beforeend",
+            usersArray[i > 0 ? i - 1 : usersArray.length - 1].makeModal()
+          );
+        }
+        if (e.target.id === "modal-next") {
+          gallery.insertAdjacentHTML(
+            "beforeend",
+            usersArray[i < usersArray.length - 1 ? i + 1 : 0].makeModal()
+          );
+        }
       });
     });
   });
