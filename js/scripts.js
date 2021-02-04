@@ -2,7 +2,7 @@ const url = `https://randomuser.me/api/?nat=us&exc=nat,gender,id,registered,logi
 const gallery = document.getElementById("gallery");
 
 class Person {
-  constructor(obj) {
+  constructor(obj, container) {
     const {
       name: { first, last },
       location: {
@@ -24,6 +24,7 @@ class Person {
     this.location = `${streetNum} ${streetName}<br>${city}, ${state} ${postcode}`;
     this.dob = date.replace(/^(\d{4})-(\d{2})-(\d{2}).+$/, "$2/$3/$1");
     this.phone = phone.replace(/^\D*(\d{3})\D*(\d{3}\D\d{4})$/, "($1) $2");
+    this.container = container;
   }
   makeCard() {
     return `<div class="card">
@@ -67,44 +68,47 @@ class Gallery {
     this.target = document.getElementById("gallery");
   }
   createUser(data) {
-    this.users.push(new Person(data));
+    this.users.push(new Person(data, this));
+  }
+  postUsers() {
+    this.users.forEach((user, i) => {
+      this.target.insertAdjacentHTML("beforeend", user.makeCard());
+      this.target.lastElementChild.addEventListener("click", () => {
+        const html = galleryObj.users[i].makeModal();
+        this.target.insertAdjacentHTML("beforeend", html);
+        const modal = this.target.lastElementChild;
+        this.activeModal = modal;
+        modal.addEventListener("click", (e) => {
+          if (e.target.tagName === "BUTTON") this.target.removeChild(modal);
+          if (e.target.id === "modal-prev") {
+            this.target.insertAdjacentHTML(
+              "beforeend",
+              galleryObj.users[
+                i > 0 ? i - 1 : galleryObj.users.length - 1
+              ].makeModal()
+            );
+          }
+          if (e.target.id === "modal-next") {
+            this.target.insertAdjacentHTML(
+              "beforeend",
+              galleryObj.users[
+                i < galleryObj.users.length - 1 ? i + 1 : 0
+              ].makeModal()
+            );
+          }
+        });
+      });
+    });
   }
   postModal() {}
 }
 const galleryObj = new Gallery(document.getElementById("gallery"));
-let usersArray = [];
+
 async function getUsers(url) {
   const res = await fetch(url);
   const { results } = await res.json();
   results.forEach((user) => galleryObj.createUser(user));
 
-  galleryObj.users.forEach((user, i) => {
-    gallery.insertAdjacentHTML("beforeend", user.makeCard());
-    gallery.lastElementChild.addEventListener("click", () => {
-      const html = galleryObj.users[i].makeModal();
-      gallery.insertAdjacentHTML("beforeend", html);
-      const modal = gallery.lastElementChild;
-      //add postModal(modal) and include the following
-      modal.addEventListener("click", (e) => {
-        if (e.target.tagName === "BUTTON") gallery.removeChild(modal);
-        if (e.target.id === "modal-prev") {
-          gallery.insertAdjacentHTML(
-            "beforeend",
-            galleryObj.users[
-              i > 0 ? i - 1 : galleryObj.users.length - 1
-            ].makeModal()
-          );
-        }
-        if (e.target.id === "modal-next") {
-          gallery.insertAdjacentHTML(
-            "beforeend",
-            galleryObj.users[
-              i < galleryObj.users.length - 1 ? i + 1 : 0
-            ].makeModal()
-          );
-        }
-      });
-    });
-  });
+  galleryObj.postUsers();
 }
 getUsers(url);
