@@ -64,12 +64,10 @@ async function getUsers(url) {
   const res = await fetch(url);
   const { results } = await res.json();
   usersArray = await results.map((user) => new Person(user));
-  usersArray.forEach((user) => {
+  usersArray.forEach((user, i) => {
     gallery.insertAdjacentHTML("beforeend", user.makeCard());
-  });
-  [...document.getElementsByClassName("card")].forEach((card) => {
-    card.addEventListener("click", (e) => {
-      const html = usersArray[[...gallery.children].indexOf(card)].makeModal();
+    gallery.lastElementChild.addEventListener("click", () => {
+      const html = usersArray[i].makeModal();
       gallery.insertAdjacentHTML("beforeend", html);
     });
   });
