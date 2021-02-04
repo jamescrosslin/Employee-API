@@ -40,7 +40,7 @@ class Person {
     return `
     <div class="modal-container">
       <div class="modal">
-        <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
+        <button type="button" id="modal-close-btn" class="modal-close-btn">X</button>
         <div class="modal-info-container">
           <img class="modal-img" src="${this.image}" alt="profile picture">
           <h3 class="modal-name cap">${this.name}</h3>
@@ -69,6 +69,12 @@ async function getUsers(url) {
     gallery.lastElementChild.addEventListener("click", () => {
       const html = usersArray[i].makeModal();
       gallery.insertAdjacentHTML("beforeend", html);
+      const modal = gallery.lastElementChild;
+      modal.addEventListener("click", (e) => {
+        if (e.target.id === "modal-close-btn")
+          return gallery.removeChild(modal);
+        if (e.target.id === "modal-prev") return arr[i];
+      });
     });
   });
 }
