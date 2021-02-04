@@ -61,23 +61,27 @@ class Person {
   }
 }
 class Gallery {
-  constructor() {
-    this.users;
-    this.activeUser;
+  constructor(target) {
+    this.users = [];
+    this.activeModal = false;
+    this.target = document.getElementById("gallery");
   }
-  createUsers() {}
+  createUser(data) {
+    this.users.push(new Person(data));
+  }
   postModal() {}
 }
+const galleryObj = new Gallery(document.getElementById("gallery"));
 let usersArray = [];
 async function getUsers(url) {
   const res = await fetch(url);
   const { results } = await res.json();
-  usersArray = results.map((user) => new Person(user));
+  results.forEach((user) => galleryObj.createUser(user));
 
-  usersArray.forEach((user, i) => {
+  galleryObj.users.forEach((user, i) => {
     gallery.insertAdjacentHTML("beforeend", user.makeCard());
     gallery.lastElementChild.addEventListener("click", () => {
-      const html = usersArray[i].makeModal();
+      const html = galleryObj.users[i].makeModal();
       gallery.insertAdjacentHTML("beforeend", html);
       const modal = gallery.lastElementChild;
       //add postModal(modal) and include the following
@@ -86,13 +90,17 @@ async function getUsers(url) {
         if (e.target.id === "modal-prev") {
           gallery.insertAdjacentHTML(
             "beforeend",
-            usersArray[i > 0 ? i - 1 : usersArray.length - 1].makeModal()
+            galleryObj.users[
+              i > 0 ? i - 1 : galleryObj.users.length - 1
+            ].makeModal()
           );
         }
         if (e.target.id === "modal-next") {
           gallery.insertAdjacentHTML(
             "beforeend",
-            usersArray[i < usersArray.length - 1 ? i + 1 : 0].makeModal()
+            galleryObj.users[
+              i < galleryObj.users.length - 1 ? i + 1 : 0
+            ].makeModal()
           );
         }
       });
