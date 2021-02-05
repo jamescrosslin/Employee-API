@@ -1,8 +1,5 @@
-const url = `https://randomuser.me/api/?nat=us&exc=nat,gender,id,registered,login&results=12&noinfo`;
-const gallery = document.getElementById("gallery");
-
 class Person {
-  constructor(obj) {
+  constructor(obj, container) {
     const {
       name: { first, last },
       location: {
@@ -24,6 +21,8 @@ class Person {
     this.location = `${streetNum} ${streetName}<br>${city}, ${state} ${postcode}`;
     this.dob = date.replace(/^(\d{4})-(\d{2})-(\d{2}).+$/, "$2/$3/$1");
     this.phone = phone.replace(/^\D*(\d{3})\D*(\d{3}\D\d{4})$/, "($1) $2");
+    this.container = container;
+    this.modal = null;
   }
   makeCard() {
     return `<div class="card">
@@ -61,42 +60,53 @@ class Person {
   }
 }
 class Gallery {
-  constructor() {
-    this.users;
-    this.activeUser;
+  constructor(target) {
+    this.users = [];
+    this.activeProfile = null;
+    this.target = target;
   }
-  createUsers() {}
-  postModal() {}
+  printUsers(data) {
+    data.forEach((user, i) => {
+      user = new Person(user, this);
+      this.users.push(user);
+      this.target.insertAdjacentHTML("beforeend", user.makeCard());
+      user.element = this.target.lastElementChild;
+      user.element.person = user;
+    });
+  }
+  printModal(selection) {
+    this.activeProfile = selection;
+    this.target.insertAdjacentHTML("beforeend", this.activeProfile.makeModal());
+  }
+  cycleModal(button) {
+    const index = this.users.indexOf(this.activeProfile);
+    let person;
+    this.target.lastElementChild.remove();
+    if (button === "modal-prev") {
+      person = this.users[index === 0 ? this.users.length - 1 : index - 1];
+      this.printModal(person);
+    }
+    if (button === "modal-next") {
+      person = this.users[index === this.users.length - 1 ? 0 : index + 1];
+      this.printModal(person);
+    }
+  }
 }
-let usersArray = [];
+
+const url = `https://randomuser.me/api/?nat=us&exc=nat,gender,id,registered,login&results=12&noinfo`;
+const gallery = new Gallery(document.getElementById("gallery"));
+
 async function getUsers(url) {
   const res = await fetch(url);
   const { results } = await res.json();
-  usersArray = results.map((user) => new Person(user));
-
-  usersArray.forEach((user, i) => {
-    gallery.insertAdjacentHTML("beforeend", user.makeCard());
-    gallery.lastElementChild.addEventListener("click", () => {
-      const html = usersArray[i].makeModal();
-      gallery.insertAdjacentHTML("beforeend", html);
-      const modal = gallery.lastElementChild;
-      //add postModal(modal) and include the following
-      modal.addEventListener("click", (e) => {
-        if (e.target.tagName === "BUTTON") gallery.removeChild(modal);
-        if (e.target.id === "modal-prev") {
-          gallery.insertAdjacentHTML(
-            "beforeend",
-            usersArray[i > 0 ? i - 1 : usersArray.length - 1].makeModal()
-          );
-        }
-        if (e.target.id === "modal-next") {
-          gallery.insertAdjacentHTML(
-            "beforeend",
-            usersArray[i < usersArray.length - 1 ? i + 1 : 0].makeModal()
-          );
-        }
-      });
-    });
-  });
+  gallery.printUsers(results);
 }
+gallery.target.addEventListener("click", (e) => {
+  if (e.target.tagName === "BUTTON") {
+    gallery.cycleModal(e.target.id);
+  } else {
+    const selection = e.path[e.path.indexOf(gallery.target) - 1];
+    gallery.printModal(selection.person);
+  }
+});
 getUsers(url);
