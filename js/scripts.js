@@ -25,7 +25,7 @@ class Person {
     //reformat phone number from "(xxx)-xxx-xxxx" to "(xxx) xxx-xxxx"
     const phoneNUm = phone.replace("-", " ");
 
-    this.user = null;
+    this.element = null;
     this.card = `<div class="card show">
       <div class="card-img-container">
         <img class="card-img" src="${pic}" alt="profile picture">
@@ -71,26 +71,29 @@ class Gallery {
       this.people.push(user);
       this.target.insertAdjacentHTML("beforeend", user.card);
       user.element = this.target.lastElementChild;
-      user.element.person = user;
     });
   }
   printModal(selection) {
     this.activeProfile = selection;
+    console.log(selection, this.activeProfile);
     this.target.insertAdjacentHTML("beforeend", this.activeProfile.modal);
   }
-  cycleModal(button) {
+  cycleModal(id) {
     const showing = [...this.showing];
     const index = showing.indexOf(this.activeProfile.element);
     let element;
     this.target.lastElementChild.remove();
-    if (button === "modal-prev") {
+    if (id === "modal-prev") {
       element = showing[index === 0 ? showing.length - 1 : index - 1];
-      this.printModal(element.person);
+      this.printModal(this.getPerson(element));
     }
-    if (button === "modal-next") {
+    if (id === "modal-next") {
       element = showing[index === showing.length - 1 ? 0 : index + 1];
-      this.printModal(element.person);
+      this.printModal(this.getPerson(element));
     }
+  }
+  getPerson(card) {
+    return this.people.find((person) => person.element === card);
   }
 }
 
@@ -107,7 +110,7 @@ gallery.target.addEventListener("click", (e) => {
     gallery.cycleModal(e.target.id);
   } else {
     const selection = e.path[e.path.indexOf(gallery.target) - 1];
-    gallery.printModal(selection.person);
+    gallery.printModal(gallery.getPerson(selection));
   }
 });
 getUsers(url);
