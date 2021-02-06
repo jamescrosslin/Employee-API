@@ -48,7 +48,7 @@ class Person {
           <img class="modal-img" src="${pic}" alt="profile picture">
           <h3 class="modal-name cap">${this.fullName}</h3>
           <p class="modal-text">${email}</p>
-          <p class="modal-text cap">$${city}, ${state}</p>
+          <p class="modal-text cap">${city}, ${state}</p>
           <hr>
           <p class="modal-text">${phoneNUm}</p>
           <p class="modal-text">${streetNum} ${streetName}<br>${city}, ${state} ${postcode}</p>
