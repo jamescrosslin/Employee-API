@@ -17,7 +17,7 @@ body {
 body {
   font-family: "Nunito", sans-serif;
   text-align: center;
-  background: rgba(235, 235, 235, 0.9);
+  background: rgba(254, 245, 254, 0.9);
 }
 
 header {
@@ -95,7 +95,7 @@ header h1 {
   border: 2px solid rgba(50,50,50, 0.3);
   border-radius: 3em;
   box-shadow:  2px 2px 3px 1px rgba(50, 50, 50, 0.3),
-   -1px -1px 2px 1px  rgba(255, 255, 255, 0.7);
+   -1px -1px 2px 1px  rgba(255, 255, 255, 0.4);
   text-shadow: 1px 1px 1px rgba(50, 50, 50, 0.3),
   -1px -1px 1px rgba(255, 255, 255, 0.7);
   transition: 0.4s ease-out;
