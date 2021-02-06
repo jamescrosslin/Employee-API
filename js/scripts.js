@@ -136,8 +136,6 @@ class Gallery {
 
 const url = `https://randomuser.me/api/?nat=us&exc=nat,gender,id,registered,login&results=12&noinfo`;
 const gallery = new Gallery(document.getElementById("gallery"));
-const form = document.querySelector("form");
-const searchBar = form.firstElementChild;
 
 /**
  * @param {string} url the API url to obtain data objects representing people
@@ -158,22 +156,16 @@ gallery.target.addEventListener("click", (e) => {
   if (e.target.tagName === "BUTTON") {
     gallery.cycleModal(e.target.id);
   } else if (e.target.id !== "gallery") {
+
     //composedPath gives an array containing the path of event bubbling
     const eventPath = e.composedPath();
+
     //selection is the immediate predecessor (and child) of gallery on the event path
     const selection = eventPath[eventPath.indexOf(gallery.target) - 1];
     const person = gallery.people.find((person) => person.element === selection);
     if (person) gallery.printModal(person);
   }
 });
-
-function searchPeople() {
-  gallery.search(searchBar.value.toLowerCase());
-}
-
-form.addEventListener("submit", searchPeople);
-form.addEventListener("keyup", searchPeople);
-searchBar.addEventListener("search", searchPeople)
 
 ////  SET UP BEGINNING PAGE STATE  ////
 document.querySelector(".search-container").insertAdjacentHTML(
@@ -183,4 +175,13 @@ document.querySelector(".search-container").insertAdjacentHTML(
     <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
   </form>`
 );
+
+const form = document.querySelector("form");
+const searchBar = form.firstElementChild;
+const searchPeople = () => gallery.search(searchBar.value.toLowerCase())
+
+form.addEventListener("submit", searchPeople);
+form.addEventListener("keyup", searchPeople);
+searchBar.addEventListener("search", searchPeople)
+
 getUsers(url);
