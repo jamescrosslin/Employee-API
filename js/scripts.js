@@ -134,7 +134,7 @@ class Gallery {
   }
 }
 
-const url = `https://randomuser.me/api/?nat=us&exc=nat,gender,id,registered,login&results=12&noinfo`;
+const url = `https://randomuser.me/api/?nat=us&exc=nat,gender,id,registered,login&results=18&noinfo`;
 const gallery = new Gallery(document.getElementById("gallery"));
 
 /**
